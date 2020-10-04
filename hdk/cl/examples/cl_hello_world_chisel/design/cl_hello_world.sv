@@ -262,15 +262,15 @@ always_ff @(posedge clk_main_a0)
       rresp  <= 0;
    end
 
-   cl_hello_world_core CL_HELLO_WORLD_CORE(clk_main_a0,
-					   rst_main_n_sync,
-					   wr_addr,
-					   wdata,
-					   wready,
-					   sh_cl_status_vdip,
-					   hello_world_q_byte_swapped,
-					   cl_sh_status_vled,
-					   vled_q);
+   ClHelloWorldCore CL_HELLO_WORLD_CORE(clk_main_a0,
+					rst_main_n_sync,
+					wr_addr,
+					wdata,
+					wready,
+					sh_cl_status_vdip,
+					hello_world_q_byte_swapped,
+					cl_sh_status_vled,
+					vled_q);
 
 //-------------------------------------------
 // Tie-Off Unused Global Signals
