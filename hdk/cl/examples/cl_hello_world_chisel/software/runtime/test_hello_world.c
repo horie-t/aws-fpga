@@ -78,7 +78,7 @@ uint32_t byte_swap(uint32_t value) {
 
 uint32_t word_swap(uint32_t value) {
     uint32_t swapped_value = 0;
-    swapped_value = value >> 16 | value << 16
+    swapped_value = value >> 16 | value << 16;
     return swapped_value;
 }
 
