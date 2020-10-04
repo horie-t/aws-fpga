@@ -58,6 +58,7 @@ void usage(char* program_name) {
 }
 
 uint32_t byte_swap(uint32_t value);
+uint32_t word_swap(uint32_t value);
  
 #endif
 
@@ -74,6 +75,13 @@ uint32_t byte_swap(uint32_t value) {
     }
     return swapped_value;
 }
+
+uint32_t word_swap(uint32_t value) {
+    uint32_t swapped_value = 0;
+    swapped_value = value >> 16 | value << 16
+    return swapped_value;
+}
+
 
 #ifdef SV_TEST
 //For cadence and questa simulators the main has to return some value
@@ -246,7 +254,7 @@ int peek_poke_example(uint32_t value, int slot_id, int pf_id, int bar_id) {
 #endif
     
     /* write a value into the mapped address space */
-    uint32_t expected = byte_swap(value);
+    uint32_t expected = word_swap(value);
     printf("Writing 0x%08x to HELLO_WORLD register (0x%016lx)\n", value, HELLO_WORLD_REG_ADDR);
     rc = fpga_pci_poke(pci_bar_handle, HELLO_WORLD_REG_ADDR, value);
 

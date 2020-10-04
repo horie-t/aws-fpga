@@ -22,8 +22,7 @@ class ClHelloWorldCore extends Module {
   when(io.wrReady === true.B && io.wrAddr === HELLO_WORLD_REG_ADDR) {
     helloWorldQ := io.wData
   }
-  io.helloWorldQByteSwapped := Cat(helloWorldQ(7, 0), helloWorldQ(15, 8),
-    helloWorldQ(23, 16), helloWorldQ(31, 24))
+  io.helloWorldQByteSwapped := Cat(helloWorldQ(15, 0), helloWorldQ(31, 16))
 
   //-------------------------------------------------
   // Virtual LED Register

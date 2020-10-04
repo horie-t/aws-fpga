@@ -13,20 +13,18 @@ module ClHelloWorldCore(
   reg [31:0] _RAND_0;
   wire  _T_1 = io_wrAddr == 32'h500; // @[ClHelloWorldCore.scala 22:43]
   wire  _T_2 = io_wrReady & _T_1; // @[ClHelloWorldCore.scala 22:30]
-  wire [15:0] _T_7 = {helloWorldQ[23:16],helloWorldQ[31:24]}; // @[Cat.scala 29:58]
-  wire [15:0] _T_8 = {helloWorldQ[7:0],helloWorldQ[15:8]}; // @[Cat.scala 29:58]
-  reg [15:0] shClStatusVDipQ; // @[ClHelloWorldCore.scala 32:32]
+  reg [15:0] shClStatusVDipQ; // @[ClHelloWorldCore.scala 31:32]
   reg [31:0] _RAND_1;
-  reg [15:0] shClStatusVDipQ2; // @[ClHelloWorldCore.scala 33:33]
+  reg [15:0] shClStatusVDipQ2; // @[ClHelloWorldCore.scala 32:33]
   reg [31:0] _RAND_2;
-  reg [15:0] vLedQ; // @[ClHelloWorldCore.scala 35:22]
+  reg [15:0] vLedQ; // @[ClHelloWorldCore.scala 34:22]
   reg [31:0] _RAND_3;
-  wire [15:0] preClShStatusVLed = vLedQ & shClStatusVDipQ2; // @[ClHelloWorldCore.scala 36:33]
-  reg [15:0] clShStatusVLed; // @[ClHelloWorldCore.scala 37:31]
+  wire [15:0] preClShStatusVLed = vLedQ & shClStatusVDipQ2; // @[ClHelloWorldCore.scala 35:33]
+  reg [15:0] clShStatusVLed; // @[ClHelloWorldCore.scala 36:31]
   reg [31:0] _RAND_4;
-  assign io_helloWorldQByteSwapped = {_T_8,_T_7}; // @[ClHelloWorldCore.scala 25:29]
-  assign io_clShStatusVLed = clShStatusVLed; // @[ClHelloWorldCore.scala 40:21]
-  assign io_vLed = vLedQ; // @[ClHelloWorldCore.scala 39:11]
+  assign io_helloWorldQByteSwapped = {helloWorldQ[15:0],helloWorldQ[31:16]}; // @[ClHelloWorldCore.scala 25:29]
+  assign io_clShStatusVLed = clShStatusVLed; // @[ClHelloWorldCore.scala 39:21]
+  assign io_vLed = vLedQ; // @[ClHelloWorldCore.scala 38:11]
 `ifdef RANDOMIZE_GARBAGE_ASSIGN
 `define RANDOMIZE
 `endif
