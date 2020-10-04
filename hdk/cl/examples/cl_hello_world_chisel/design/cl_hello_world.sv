@@ -263,7 +263,7 @@ always_ff @(posedge clk_main_a0)
    end
 
    ClHelloWorldCore CL_HELLO_WORLD_CORE(clk_main_a0,
-					rst_main_n_sync,
+					!rst_main_n_sync,
 					wr_addr,
 					wdata,
 					wready,
