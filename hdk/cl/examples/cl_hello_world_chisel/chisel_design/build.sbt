@@ -28,7 +28,7 @@ name := "chisel-module-template"
 
 version := "0.0.1"
 
-scalaVersion := "2.11.12"
+scalaVersion := "2.12.10"
 
 crossScalaVersions := Seq("2.11.12", "2.12.4")
 
@@ -39,7 +39,7 @@ resolvers ++= Seq(
 
 // Provide a managed dependency on X if -DXVersion="" is supplied on the command line.
 val defaultVersions = Map(
-  "chisel3" -> "3.1.+",
+  "chisel3" -> "3.4.+",
   "chisel-iotesters" -> "1.3.+"
   )
 

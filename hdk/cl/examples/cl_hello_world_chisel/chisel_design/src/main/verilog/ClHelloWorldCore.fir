@@ -1,4 +1,4 @@
-;buildInfoPackage: chisel3, version: 3.2.7, scalaVersion: 2.11.12, sbtVersion: 1.3.2
+;buildInfoPackage: chisel3, version: 3.4.0, scalaVersion: 2.12.12, sbtVersion: 1.3.10
 circuit ClHelloWorldCore : 
   module ClHelloWorldCore : 
     input clock : Clock
@@ -12,17 +12,17 @@ circuit ClHelloWorldCore :
     when _T_2 : @[ClHelloWorldCore.scala 22:69]
       helloWorldQ <= io.wData @[ClHelloWorldCore.scala 23:17]
       skip @[ClHelloWorldCore.scala 22:69]
-    node _T_3 = bits(helloWorldQ, 15, 0) @[ClHelloWorldCore.scala 25:47]
-    node _T_4 = bits(helloWorldQ, 31, 16) @[ClHelloWorldCore.scala 25:67]
-    node _T_5 = cat(_T_3, _T_4) @[Cat.scala 29:58]
-    io.helloWorldQByteSwapped <= _T_5 @[ClHelloWorldCore.scala 25:29]
+    node io_helloWorldQByteSwapped_right = bits(helloWorldQ, 15, 0) @[ClHelloWorldCore.scala 25:47]
+    node io_helloWorldQByteSwapped_left = bits(helloWorldQ, 31, 16) @[ClHelloWorldCore.scala 25:67]
+    node _io_helloWorldQByteSwapped_T = cat(io_helloWorldQByteSwapped_right, io_helloWorldQByteSwapped_left) @[Cat.scala 29:58]
+    io.helloWorldQByteSwapped <= _io_helloWorldQByteSwapped_T @[ClHelloWorldCore.scala 25:29]
     reg shClStatusVDipQ : UInt, clock with : (reset => (reset, UInt<16>("h00"))) @[ClHelloWorldCore.scala 31:32]
     shClStatusVDipQ <= io.shClStatusVDip @[ClHelloWorldCore.scala 31:32]
     reg shClStatusVDipQ2 : UInt, clock with : (reset => (reset, UInt<16>("h00"))) @[ClHelloWorldCore.scala 32:33]
     shClStatusVDipQ2 <= shClStatusVDipQ @[ClHelloWorldCore.scala 32:33]
-    node _T_6 = bits(helloWorldQ, 15, 0) @[ClHelloWorldCore.scala 34:34]
+    node _T_3 = bits(helloWorldQ, 15, 0) @[ClHelloWorldCore.scala 34:34]
     reg vLedQ : UInt, clock with : (reset => (reset, UInt<16>("h00"))) @[ClHelloWorldCore.scala 34:22]
-    vLedQ <= _T_6 @[ClHelloWorldCore.scala 34:22]
+    vLedQ <= _T_3 @[ClHelloWorldCore.scala 34:22]
     node preClShStatusVLed = and(vLedQ, shClStatusVDipQ2) @[ClHelloWorldCore.scala 35:33]
     reg clShStatusVLed : UInt, clock with : (reset => (reset, UInt<16>("h00"))) @[ClHelloWorldCore.scala 36:31]
     clShStatusVLed <= preClShStatusVLed @[ClHelloWorldCore.scala 36:31]
