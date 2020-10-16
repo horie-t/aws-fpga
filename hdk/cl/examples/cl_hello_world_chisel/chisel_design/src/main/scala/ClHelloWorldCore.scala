@@ -2,21 +2,15 @@ import chisel3._
 import chisel3.util._
 
 class ClHelloWorldCore extends MultiIOModule {
-  val io = IO(new Bundle {
-    val wrAddr = Input(UInt(32.W))
-    val wData = Input(UInt(32.W))
-    val wrReady = Input(Bool())
-    val shClStatusVDip = Input(UInt(16.W))
-    val helloWorldQByteSwapped = Output(UInt(32.W))
-    val clShStatusVLed = Output(UInt(16.W))
-    val vLed = Output(UInt(16.W))
-  })
-
+  /*----------------------------------------
+   * AXI LiteのI/O
+   *----------------------------------------*/
   //// 入力
   // 書き込み
-  val awwarid = IO(Input(Bool()))
+  val awvarid = IO(Input(Bool()))
   val awadder = IO(Input(UInt(32.W)))
   val wvalid = IO(Input(Bool()))
+  val wdata = IO(Input(UInt(32.W)))
   val wstrb = IO(Input(UInt(4.W)))
   val bready = IO(Input(Bool()))
   // 読み出し
@@ -36,8 +30,17 @@ class ClHelloWorldCore extends MultiIOModule {
   val rdata = IO(Output(UInt(32.W)))
   val rresp = IO(Output(UInt(2.W)))
 
+  /*----------------------------------------
+   * 仮想LED用のI/O
+   *----------------------------------------*/
+  val sh_cl_status_vdip = IO(Input(UInt(16.W)))
+  val cl_sh_status_vled = IO(Output(UInt(16.W)))
+
   val HELLO_WORLD_REG_ADDR = "h0000_0500".U(32.W)
 
+  /*----------------------------------------
+   * AXI Liteの読み書き
+   *----------------------------------------*/
   /*
    * 読み出し
    */
@@ -61,32 +64,43 @@ class ClHelloWorldCore extends MultiIOModule {
   arready := readStateReg === sReadAddrReady
   rvalid := readStateReg === sReadDateValid
   rdata := Mux(readAddrReg === HELLO_WORLD_REG_ADDR,
-    Cat(helloWorldQ(15, 0), helloWorldQ(31, 16)),
+    Cat(helloWorldReg(15, 0), helloWorldReg(31, 16)),
     Cat(0.U(16.W), vLedQ))
 
-  //-------------------------------------------------
-  // Hello World Register
-  //-------------------------------------------------
-  // When read it, returns the byte-flipped value.
-  val helloWorldQ = RegInit(0.U(32.W))
-  when(io.wrReady === true.B && io.wrAddr === HELLO_WORLD_REG_ADDR) {
-    helloWorldQ := io.wData
-  }
-  io.helloWorldQByteSwapped := Cat(helloWorldQ(15, 0), helloWorldQ(31, 16))
+  /*
+   * 書き込み
+   */
+  /* 書き込みステート定義
+   *  */
+  val sWriteIdle :: sWriteReady :: sWriteDone :: Nil = Enum(3)
+  val writeStateReg = RegInit(sWriteIdle)
 
-  //-------------------------------------------------
-  // Virtual LED Register
-  //-------------------------------------------------
-  // Flop/synchronize interface signals
-  val shClStatusVDipQ = RegNext(io.shClStatusVDip , 0.U(16.W))
+  // ステートマシン
+  val writeAddrReg = RegInit(0.U(32.W))
+  val helloWorldReg = RegInit(0.U(32.W))
+  when (writeStateReg === sWriteIdle && awvarid && wvalid) {
+    writeStateReg := sWriteReady
+    writeAddrReg := awadder
+  } .elsewhen (writeStateReg === sWriteReady) {
+    writeStateReg := sWriteDone
+    when (writeAddrReg === HELLO_WORLD_REG_ADDR) {
+      helloWorldReg := wdata
+    }
+  } .elsewhen (writeStateReg === sWriteDone && bready) {
+    writeStateReg := sWriteIdle
+  }
+
+  /*----------------------------------------
+   * 仮想LED
+   *----------------------------------------*/
+  // 同期化
+  val shClStatusVDipQ = RegNext(sh_cl_status_vdip , 0.U(16.W))
   val shClStatusVDipQ2 = RegNext(shClStatusVDipQ, 0.U(16.W))
 
-  val vLedQ = RegNext(helloWorldQ(15, 0), 0.U(16.W))
+  val vLedQ = RegNext(helloWorldReg(15, 0), 0.U(16.W))
   val preClShStatusVLed = vLedQ & shClStatusVDipQ2
   val clShStatusVLed = RegNext(preClShStatusVLed, 0.U(16.W))
-
-  io.vLed := vLedQ
-  io.clShStatusVLed := clShStatusVLed
+  cl_sh_status_vled := clShStatusVLed
 }
 
 object ClHelloWorldCore extends App {
