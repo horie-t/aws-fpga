@@ -46,6 +46,11 @@ logic rst_main_n_sync;
 `include "unused_apppf_irq_template.inc"
 
 //-------------------------------------------------
+// Wires
+//-------------------------------------------------
+  logic [15:0] pre_cl_sh_status_vled;
+   
+//-------------------------------------------------
 // ID Values (cl_hello_world_defines.vh)
 //-------------------------------------------------
   assign cl_sh_id0[31:0] = `CL_SH_ID0;
@@ -186,6 +191,18 @@ always_ff @(negedge rst_main_n or posedge clk_main_a0)
    assign ocl_sh_rresp_q   = rresp[1:0];
 
    ClHelloWorldCore CL_HELLO_WORLD_CORE(.*, .clock(clk_main_a0), .reset(!rst_main_n_sync));
+
+//-------------------------------------------------
+// Virtual LED Register
+//-------------------------------------------------
+// Flop/synchronize interface signals
+always_ff @(posedge clk_main_a0)
+   if (!rst_main_n_sync) begin                    // Reset
+      cl_sh_status_vled[15:0]    <= 16'h0000;
+   end
+   else begin
+      cl_sh_status_vled[15:0]    <= pre_cl_sh_status_vled[15:0];
+   end
 
 //-------------------------------------------
 // Tie-Off Unused Global Signals
