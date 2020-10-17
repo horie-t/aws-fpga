@@ -46,18 +46,6 @@ logic rst_main_n_sync;
 `include "unused_apppf_irq_template.inc"
 
 //-------------------------------------------------
-// Wires
-//-------------------------------------------------
-  logic        arvalid_q;
-  logic [31:0] araddr_q;
-  logic [31:0] hello_world_q_byte_swapped;
-  logic [15:0] vled_q;
-  //logic [15:0] pre_cl_sh_status_vled;
-  //logic [15:0] sh_cl_status_vdip_q;
-  //logic [15:0] sh_cl_status_vdip_q2;
-  //logic [31:0] hello_world_q;
-
-//-------------------------------------------------
 // ID Values (cl_hello_world_defines.vh)
 //-------------------------------------------------
   assign cl_sh_id0[31:0] = `CL_SH_ID0;
@@ -197,80 +185,7 @@ always_ff @(negedge rst_main_n or posedge clk_main_a0)
    assign ocl_sh_rdata_q   = rdata;
    assign ocl_sh_rresp_q   = rresp[1:0];
 
-// Write Request
-logic        wr_active;
-logic [31:0] wr_addr;
-
-always_ff @(posedge clk_main_a0)
-  if (!rst_main_n_sync) begin
-     wr_active <= 0;
-     wr_addr   <= 0;
-  end
-  else begin
-     wr_active <=  wr_active && bvalid  && bready ? 1'b0     :
-                  ~wr_active && awvalid           ? 1'b1     :
-                                                    wr_active;
-     wr_addr <= awvalid && ~wr_active ? awaddr : wr_addr     ;
-  end
-
-assign awready = ~wr_active;
-assign wready  =  wr_active && wvalid;
-
-// Write Response
-always_ff @(posedge clk_main_a0)
-  if (!rst_main_n_sync) 
-    bvalid <= 0;
-  else
-    bvalid <=  bvalid &&  bready           ? 1'b0  : 
-                         ~bvalid && wready ? 1'b1  :
-                                             bvalid;
-assign bresp = 0;
-
-// Read Request
-always_ff @(posedge clk_main_a0)
-   if (!rst_main_n_sync) begin
-      arvalid_q <= 0;
-      araddr_q  <= 0;
-   end
-   else begin
-      arvalid_q <= arvalid;
-      araddr_q  <= arvalid ? araddr : araddr_q;
-   end
-
-assign arready = !arvalid_q && !rvalid;
-
-// Read Response
-always_ff @(posedge clk_main_a0)
-   if (!rst_main_n_sync)
-   begin
-      rvalid <= 0;
-      rdata  <= 0;
-      rresp  <= 0;
-   end
-   else if (rvalid && rready)
-   begin
-      rvalid <= 0;
-      rdata  <= 0;
-      rresp  <= 0;
-   end
-   else if (arvalid_q) 
-   begin
-      rvalid <= 1;
-      rdata  <= (araddr_q == `HELLO_WORLD_REG_ADDR) ? hello_world_q_byte_swapped[31:0]:
-                (araddr_q == `VLED_REG_ADDR       ) ? {16'b0,vled_q[15:0]            }:
-                                                      `UNIMPLEMENTED_REG_VALUE        ;
-      rresp  <= 0;
-   end
-
-   ClHelloWorldCore CL_HELLO_WORLD_CORE(clk_main_a0,
-					!rst_main_n_sync,
-					wr_addr,
-					wdata,
-					wready,
-					sh_cl_status_vdip,
-					hello_world_q_byte_swapped,
-					cl_sh_status_vled,
-					vled_q);
+   ClHelloWorldCore CL_HELLO_WORLD_CORE(.*, clk_main_a0, !rst_main_n_sync);
 
 //-------------------------------------------
 // Tie-Off Unused Global Signals
