@@ -7,7 +7,7 @@ module ClHelloWorldCore(
   input  [31:0] wdata,
   input  [3:0]  wstrb,
   input         bready,
-  input         arvaild,
+  input         arvalid,
   input  [31:0] araddr,
   input         rready,
   output        awready,
@@ -54,7 +54,7 @@ module ClHelloWorldCore(
   always @(posedge clock) begin
     if (reset) begin // @[ClHelloWorldCore.scala 52:29]
       readStateReg <= 2'h0; // @[ClHelloWorldCore.scala 52:29]
-    end else if (readStateReg == 2'h0 & arvaild) begin // @[ClHelloWorldCore.scala 56:48]
+    end else if (readStateReg == 2'h0 & arvalid) begin // @[ClHelloWorldCore.scala 56:48]
       readStateReg <= 2'h1; // @[ClHelloWorldCore.scala 57:18]
     end else if (readStateReg == 2'h1) begin // @[ClHelloWorldCore.scala 59:49]
       readStateReg <= 2'h2; // @[ClHelloWorldCore.scala 60:18]
@@ -63,7 +63,7 @@ module ClHelloWorldCore(
     end
     if (reset) begin // @[ClHelloWorldCore.scala 55:28]
       readAddrReg <= 32'h0; // @[ClHelloWorldCore.scala 55:28]
-    end else if (readStateReg == 2'h0 & arvaild) begin // @[ClHelloWorldCore.scala 56:48]
+    end else if (readStateReg == 2'h0 & arvalid) begin // @[ClHelloWorldCore.scala 56:48]
       readAddrReg <= araddr; // @[ClHelloWorldCore.scala 58:17]
     end
     if (reset) begin // @[ClHelloWorldCore.scala 71:30]

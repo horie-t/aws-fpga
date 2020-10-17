@@ -9,7 +9,7 @@ circuit ClHelloWorldCore :
     input wdata : UInt<32>
     input wstrb : UInt<4>
     input bready : UInt<1>
-    input arvaild : UInt<1>
+    input arvalid : UInt<1>
     input araddr : UInt<32>
     input rready : UInt<1>
     output awready : UInt<1>
@@ -26,7 +26,7 @@ circuit ClHelloWorldCore :
     reg readStateReg : UInt<2>, clock with : (reset => (reset, UInt<2>("h00"))) @[ClHelloWorldCore.scala 52:29]
     reg readAddrReg : UInt<32>, clock with : (reset => (reset, UInt<32>("h00"))) @[ClHelloWorldCore.scala 55:28]
     node _T = eq(readStateReg, UInt<2>("h00")) @[ClHelloWorldCore.scala 56:22]
-    node _T_1 = and(_T, arvaild) @[ClHelloWorldCore.scala 56:36]
+    node _T_1 = and(_T, arvalid) @[ClHelloWorldCore.scala 56:36]
     when _T_1 : @[ClHelloWorldCore.scala 56:48]
       readStateReg <= UInt<2>("h01") @[ClHelloWorldCore.scala 57:18]
       readAddrReg <= araddr @[ClHelloWorldCore.scala 58:17]

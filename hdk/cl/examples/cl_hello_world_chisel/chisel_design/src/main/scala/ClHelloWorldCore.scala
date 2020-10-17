@@ -14,7 +14,7 @@ class ClHelloWorldCore extends MultiIOModule {
   val wstrb = IO(Input(UInt(4.W)))
   val bready = IO(Input(Bool()))
   // 読み出し
-  val arvaild = IO(Input(Bool()))
+  val arvalid = IO(Input(Bool()))
   val araddr = IO(Input(UInt(32.W)))
   val rready = IO(Input(Bool()))
 
@@ -53,7 +53,7 @@ class ClHelloWorldCore extends MultiIOModule {
 
   //ステートマシン
   val readAddrReg = RegInit(0.U(32.W))
-  when (readStateReg === sReadIdle && arvaild) {
+  when (readStateReg === sReadIdle && arvalid) {
     readStateReg := sReadAddrReady
     readAddrReg := araddr
   } .elsewhen (readStateReg === sReadAddrReady) {
