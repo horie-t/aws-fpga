@@ -3,7 +3,7 @@ circuit ClHelloWorldCore :
   module ClHelloWorldCore : 
     input clock : Clock
     input reset : UInt<1>
-    input awvarid : UInt<1>
+    input awvalid : UInt<1>
     input awadder : UInt<32>
     input wvalid : UInt<1>
     input wdata : UInt<32>
@@ -46,7 +46,7 @@ circuit ClHelloWorldCore :
     reg writeAddrReg : UInt<32>, clock with : (reset => (reset, UInt<32>("h00"))) @[ClHelloWorldCore.scala 74:29]
     reg helloWorldReg : UInt<32>, clock with : (reset => (reset, UInt<32>("h00"))) @[ClHelloWorldCore.scala 75:30]
     node _T_5 = eq(writeStateReg, UInt<2>("h00")) @[ClHelloWorldCore.scala 76:23]
-    node _T_6 = and(_T_5, awvarid) @[ClHelloWorldCore.scala 76:38]
+    node _T_6 = and(_T_5, awvalid) @[ClHelloWorldCore.scala 76:38]
     node _T_7 = and(_T_6, wvalid) @[ClHelloWorldCore.scala 76:49]
     when _T_7 : @[ClHelloWorldCore.scala 76:60]
       writeStateReg <= UInt<2>("h01") @[ClHelloWorldCore.scala 77:19]

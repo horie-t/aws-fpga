@@ -7,7 +7,7 @@ class ClHelloWorldCore extends MultiIOModule {
    *----------------------------------------*/
   //// 入力
   // 書き込み
-  val awvarid = IO(Input(Bool()))
+  val awvalid = IO(Input(Bool()))
   val awadder = IO(Input(UInt(32.W)))
   val wvalid = IO(Input(Bool()))
   val wdata = IO(Input(UInt(32.W)))
@@ -73,7 +73,7 @@ class ClHelloWorldCore extends MultiIOModule {
   // ステートマシン
   val writeAddrReg = RegInit(0.U(32.W))
   val helloWorldReg = RegInit(0.U(32.W))
-  when (writeStateReg === sWriteIdle && awvarid && wvalid) {
+  when (writeStateReg === sWriteIdle && awvalid && wvalid) {
     writeStateReg := sWriteReady
     writeAddrReg := awadder
   } .elsewhen (writeStateReg === sWriteReady) {

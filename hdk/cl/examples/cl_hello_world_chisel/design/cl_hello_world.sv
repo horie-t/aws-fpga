@@ -185,7 +185,7 @@ always_ff @(negedge rst_main_n or posedge clk_main_a0)
    assign ocl_sh_rdata_q   = rdata;
    assign ocl_sh_rresp_q   = rresp[1:0];
 
-   ClHelloWorldCore CL_HELLO_WORLD_CORE(.*, clk_main_a0, !rst_main_n_sync);
+   ClHelloWorldCore CL_HELLO_WORLD_CORE(.*, .clock(clk_main_a0), .reset(!rst_main_n_sync));
 
 //-------------------------------------------
 // Tie-Off Unused Global Signals
