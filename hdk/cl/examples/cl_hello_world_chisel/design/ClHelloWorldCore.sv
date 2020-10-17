@@ -2,7 +2,7 @@ module ClHelloWorldCore(
   input         clock,
   input         reset,
   input         awvalid,
-  input  [31:0] awadder,
+  input  [31:0] awaddr,
   input         wvalid,
   input  [31:0] wdata,
   input  [3:0]  wstrb,
@@ -81,7 +81,7 @@ module ClHelloWorldCore(
     if (reset) begin // @[ClHelloWorldCore.scala 74:29]
       writeAddrReg <= 32'h0; // @[ClHelloWorldCore.scala 74:29]
     end else if (writeStateReg == 2'h0 & awvalid & wvalid) begin // @[ClHelloWorldCore.scala 76:60]
-      writeAddrReg <= awadder; // @[ClHelloWorldCore.scala 78:18]
+      writeAddrReg <= awaddr; // @[ClHelloWorldCore.scala 78:18]
     end
     if (reset) begin // @[ClHelloWorldCore.scala 75:30]
       helloWorldReg <= 32'h0; // @[ClHelloWorldCore.scala 75:30]

@@ -4,7 +4,7 @@ circuit ClHelloWorldCore :
     input clock : Clock
     input reset : UInt<1>
     input awvalid : UInt<1>
-    input awadder : UInt<32>
+    input awaddr : UInt<32>
     input wvalid : UInt<1>
     input wdata : UInt<32>
     input wstrb : UInt<4>
@@ -50,7 +50,7 @@ circuit ClHelloWorldCore :
     node _T_7 = and(_T_6, wvalid) @[ClHelloWorldCore.scala 76:49]
     when _T_7 : @[ClHelloWorldCore.scala 76:60]
       writeStateReg <= UInt<2>("h01") @[ClHelloWorldCore.scala 77:19]
-      writeAddrReg <= awadder @[ClHelloWorldCore.scala 78:18]
+      writeAddrReg <= awaddr @[ClHelloWorldCore.scala 78:18]
       skip @[ClHelloWorldCore.scala 76:60]
     else : @[ClHelloWorldCore.scala 79:47]
       node _T_8 = eq(writeStateReg, UInt<2>("h01")) @[ClHelloWorldCore.scala 79:30]
