@@ -1,7 +1,7 @@
 module ClHelloWorldCore(
   input         clock,
   input         reset,
-  input         awvarid,
+  input         awvalid,
   input  [31:0] awadder,
   input         wvalid,
   input  [31:0] wdata,
@@ -71,7 +71,7 @@ module ClHelloWorldCore(
     end
     if (reset) begin // @[ClHelloWorldCore.scala 71:30]
       writeStateReg <= 2'h0; // @[ClHelloWorldCore.scala 71:30]
-    end else if (writeStateReg == 2'h0 & awvarid & wvalid) begin // @[ClHelloWorldCore.scala 76:60]
+    end else if (writeStateReg == 2'h0 & awvalid & wvalid) begin // @[ClHelloWorldCore.scala 76:60]
       writeStateReg <= 2'h1; // @[ClHelloWorldCore.scala 77:19]
     end else if (writeStateReg == 2'h1) begin // @[ClHelloWorldCore.scala 79:47]
       writeStateReg <= 2'h2; // @[ClHelloWorldCore.scala 80:19]
@@ -80,12 +80,12 @@ module ClHelloWorldCore(
     end
     if (reset) begin // @[ClHelloWorldCore.scala 74:29]
       writeAddrReg <= 32'h0; // @[ClHelloWorldCore.scala 74:29]
-    end else if (writeStateReg == 2'h0 & awvarid & wvalid) begin // @[ClHelloWorldCore.scala 76:60]
+    end else if (writeStateReg == 2'h0 & awvalid & wvalid) begin // @[ClHelloWorldCore.scala 76:60]
       writeAddrReg <= awadder; // @[ClHelloWorldCore.scala 78:18]
     end
     if (reset) begin // @[ClHelloWorldCore.scala 75:30]
       helloWorldReg <= 32'h0; // @[ClHelloWorldCore.scala 75:30]
-    end else if (!(writeStateReg == 2'h0 & awvarid & wvalid)) begin // @[ClHelloWorldCore.scala 76:60]
+    end else if (!(writeStateReg == 2'h0 & awvalid & wvalid)) begin // @[ClHelloWorldCore.scala 76:60]
       if (writeStateReg == 2'h1) begin // @[ClHelloWorldCore.scala 79:47]
         if (writeAddrReg == 32'h500) begin // @[ClHelloWorldCore.scala 81:50]
           helloWorldReg <= wdata; // @[ClHelloWorldCore.scala 82:21]
