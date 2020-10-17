@@ -150,59 +150,28 @@ always_ff @(negedge rst_main_n or posedge clk_main_a0)
 //--------------------------------------------------------------
 // Only supports single-beat accesses.
 
-   logic        awvalid;
-   logic [31:0] awaddr;
-   logic        wvalid;
-   logic [31:0] wdata;
-   logic [3:0]  wstrb;
-   logic        bready;
-   logic        arvalid;
-   logic [31:0] araddr;
-   logic        rready;
-
-   logic        awready;
-   logic        wready;
-   logic        bvalid;
-   logic [1:0]  bresp;
-   logic        arready;
-   logic        rvalid;
-   logic [31:0] rdata;
-   logic [1:0]  rresp;
-
-   // Inputs
-   assign awvalid         = sh_ocl_awvalid_q;
-   assign awaddr[31:0]    = sh_ocl_awaddr_q;
-   assign wvalid          = sh_ocl_wvalid_q;
-   assign wdata[31:0]     = sh_ocl_wdata_q;
-   assign wstrb[3:0]      = sh_ocl_wstrb_q;
-   assign bready          = sh_ocl_bready_q;
-   assign arvalid         = sh_ocl_arvalid_q;
-   assign araddr[31:0]    = sh_ocl_araddr_q;
-   assign rready          = sh_ocl_rready_q;
-
-   // Outputs
-   assign ocl_sh_awready_q = awready;
-   assign ocl_sh_wready_q  = wready;
-   assign ocl_sh_bvalid_q  = bvalid;
-   assign ocl_sh_bresp_q   = bresp[1:0];
-   assign ocl_sh_arready_q = arready;
-   assign ocl_sh_rvalid_q  = rvalid;
-   assign ocl_sh_rdata_q   = rdata;
-   assign ocl_sh_rresp_q   = rresp[1:0];
-
-   ClHelloWorldCore CL_HELLO_WORLD_CORE(.*, .clock(clk_main_a0), .reset(!rst_main_n_sync));
-
-//-------------------------------------------------
-// Virtual LED Register
-//-------------------------------------------------
-// Flop/synchronize interface signals
-always_ff @(posedge clk_main_a0)
-   if (!rst_main_n_sync) begin                    // Reset
-      cl_sh_status_vled[15:0]    <= 16'h0000;
-   end
-   else begin
-      cl_sh_status_vled[15:0]    <= pre_cl_sh_status_vled[15:0];
-   end
+   ClHelloWorldCore CL_HELLO_WORLD_CORE(.clock(clk_main_a0),
+					.reset(!rst_main_n_sync),
+					.s_axi_awvalid(sh_ocl_awvalid_q),
+					.s_axi_awaddr(sh_ocl_awaddr_q),
+					.s_axi_wvalid(sh_ocl_wvalid_q),
+					.s_axi_wdata(sh_ocl_wdata_q),
+					.s_axi_wstrb(sh_ocl_wstrb_q),
+					.s_axi_bready(sh_ocl_bready_q),
+					.s_axi_arvalid(sh_ocl_arvalid_q),
+					.s_axi_araddr(sh_ocl_araddr_q),
+					.s_axi_rready(sh_ocl_rready_q),
+					.s_axi_awready(ocl_sh_awready_q),
+					.s_axi_wready(ocl_sh_wready_q),
+					.s_axi_bvalid(ocl_sh_bvalid_q),
+					.s_axi_bresp(ocl_sh_bresp_q),
+					.s_axi_arready(ocl_sh_arready_q),
+					.s_axi_rvalid(ocl_sh_rvalid_q),
+					.s_axi_rdata(ocl_sh_rdata_q),
+					.s_axi_rresp(ocl_sh_rresp_q),
+					.sh_cl_status_vdip(sh_cl_status_vdip),
+					.cl_sh_status_vled(cl_sh_status_vled)
+					);
 
 //-------------------------------------------
 // Tie-Off Unused Global Signals

@@ -7,34 +7,34 @@ class ClHelloWorldCore extends MultiIOModule {
    *----------------------------------------*/
   //// 入力
   // 書き込み
-  val awvalid = IO(Input(Bool()))
-  val awaddr = IO(Input(UInt(32.W)))
-  val wvalid = IO(Input(Bool()))
-  val wdata = IO(Input(UInt(32.W)))
-  val wstrb = IO(Input(UInt(4.W)))
-  val bready = IO(Input(Bool()))
+  val s_axi_awvalid = IO(Input(Bool()))
+  val s_axi_awaddr = IO(Input(UInt(32.W)))
+  val s_axi_wvalid = IO(Input(Bool()))
+  val s_axi_wdata = IO(Input(UInt(32.W)))
+  val s_axi_wstrb = IO(Input(UInt(4.W)))
+  val s_axi_bready = IO(Input(Bool()))
   // 読み出し
-  val arvalid = IO(Input(Bool()))
-  val araddr = IO(Input(UInt(32.W)))
-  val rready = IO(Input(Bool()))
+  val s_axi_arvalid = IO(Input(Bool()))
+  val s_axi_araddr = IO(Input(UInt(32.W)))
+  val s_axi_rready = IO(Input(Bool()))
 
   //// 出力
   // 書き込み
-  val awready = IO(Output(Bool()))
-  val wready = IO(Output(Bool()))
-  val bvalid = IO(Output(Bool()))
-  val bresp = IO(Output(UInt(2.W)))
+  val s_axi_awready = IO(Output(Bool()))
+  val s_axi_wready = IO(Output(Bool()))
+  val s_axi_bvalid = IO(Output(Bool()))
+  val s_axi_bresp = IO(Output(UInt(2.W)))
   // 読み出し
-  val arready = IO(Output(Bool()))
-  val rvalid = IO(Output(Bool()))
-  val rdata = IO(Output(UInt(32.W)))
-  val rresp = IO(Output(UInt(2.W)))
+  val s_axi_arready = IO(Output(Bool()))
+  val s_axi_rvalid = IO(Output(Bool()))
+  val s_axi_rdata = IO(Output(UInt(32.W)))
+  val s_axi_rresp = IO(Output(UInt(2.W)))
 
   /*----------------------------------------
    * 仮想LED用のI/O
    *----------------------------------------*/
   val sh_cl_status_vdip = IO(Input(UInt(16.W)))
-  val pre_cl_sh_status_vled = IO(Output(UInt(16.W)))
+  val cl_sh_status_vled = IO(Output(UInt(16.W)))
 
   // 定数定義
   val HELLO_WORLD_REG_ADDR = "h0000_0500".U(32.W)
@@ -53,12 +53,12 @@ class ClHelloWorldCore extends MultiIOModule {
 
   //ステートマシン
   val readAddrReg = RegInit(0.U(32.W))
-  when (readStateReg === sReadIdle && arvalid) {
+  when (readStateReg === sReadIdle && s_axi_arvalid) {
     readStateReg := sReadAddrReady
-    readAddrReg := araddr
+    readAddrReg := s_axi_araddr
   } .elsewhen (readStateReg === sReadAddrReady) {
     readStateReg := sReadDateValid
-  } .elsewhen (readStateReg === sReadDateValid && rready) {
+  } .elsewhen (readStateReg === sReadDateValid && s_axi_rready) {
     readStateReg := sReadIdle
   }
 
@@ -73,15 +73,15 @@ class ClHelloWorldCore extends MultiIOModule {
   // ステートマシン
   val writeAddrReg = RegInit(0.U(32.W))
   val helloWorldReg = RegInit(0.U(32.W))
-  when (writeStateReg === sWriteIdle && awvalid && wvalid) {
+  when (writeStateReg === sWriteIdle && s_axi_awvalid && s_axi_wvalid) {
     writeStateReg := sWriteReady
-    writeAddrReg := awaddr
+    writeAddrReg := s_axi_awaddr
   } .elsewhen (writeStateReg === sWriteReady) {
     writeStateReg := sWriteDone
     when (writeAddrReg === HELLO_WORLD_REG_ADDR) {
-      helloWorldReg := wdata
+      helloWorldReg := s_axi_wdata
     }
-  } .elsewhen (writeStateReg === sWriteDone && bready) {
+  } .elsewhen (writeStateReg === sWriteDone && s_axi_bready) {
     writeStateReg := sWriteIdle
   }
 
@@ -92,20 +92,21 @@ class ClHelloWorldCore extends MultiIOModule {
   val shClStatusVDipQ = RegNext(sh_cl_status_vdip , 0.U(16.W))
   val shClStatusVDipQ2 = RegNext(shClStatusVDipQ, 0.U(16.W))
   val vLedQ = RegNext(helloWorldReg(15, 0), 0.U(16.W))
-  pre_cl_sh_status_vled := vLedQ & shClStatusVDipQ2
+  val clSHStatusVLedQ = RegNext(vLedQ & shClStatusVDipQ2, 0.U(16.W))
+  cl_sh_status_vled := clSHStatusVLedQ
 
   // HelloWorldレジスタ
-  arready := readStateReg === sReadAddrReady
-  rvalid := readStateReg === sReadDateValid
-  rdata := Mux(readAddrReg === HELLO_WORLD_REG_ADDR,
+  s_axi_arready := readStateReg === sReadAddrReady
+  s_axi_rvalid := readStateReg === sReadDateValid
+  s_axi_rdata := Mux(readAddrReg === HELLO_WORLD_REG_ADDR,
     Cat(helloWorldReg(15, 0), helloWorldReg(31, 16)),
     Cat(0.U(16.W), vLedQ))
-  rresp := AXI_OK    // エラーは起きないものとする
+  s_axi_rresp := AXI_OK    // エラーは起きないものとする
 
-  awready := writeStateReg === sWriteReady
-  wready := writeStateReg === sWriteReady
-  bresp := AXI_OK   // エラーは起きないものとする
-  bvalid := writeStateReg === sWriteDone
+  s_axi_awready := writeStateReg === sWriteReady
+  s_axi_wready := writeStateReg === sWriteReady
+  s_axi_bresp := AXI_OK   // エラーは起きないものとする
+  s_axi_bvalid := writeStateReg === sWriteDone
 }
 
 object ClHelloWorldCore extends App {
