@@ -36,7 +36,9 @@ class ClHelloWorldCore extends MultiIOModule {
   val sh_cl_status_vdip = IO(Input(UInt(16.W)))
   val cl_sh_status_vled = IO(Output(UInt(16.W)))
 
+  // 定数定義
   val HELLO_WORLD_REG_ADDR = "h0000_0500".U(32.W)
+  val AXI_OK = 0.U(2.W)
 
   /*----------------------------------------
    * AXI Liteの読み書き
@@ -59,13 +61,6 @@ class ClHelloWorldCore extends MultiIOModule {
   } .elsewhen (readStateReg === sReadDateValid && rready) {
     readStateReg := sReadIdle
   }
-
-  // 出力
-  arready := readStateReg === sReadAddrReady
-  rvalid := readStateReg === sReadDateValid
-  rdata := Mux(readAddrReg === HELLO_WORLD_REG_ADDR,
-    Cat(helloWorldReg(15, 0), helloWorldReg(31, 16)),
-    Cat(0.U(16.W), vLedQ))
 
   /*
    * 書き込み
@@ -91,16 +86,28 @@ class ClHelloWorldCore extends MultiIOModule {
   }
 
   /*----------------------------------------
-   * 仮想LED
+   * 出力
    *----------------------------------------*/
-  // 同期化
+  // 仮想LED
   val shClStatusVDipQ = RegNext(sh_cl_status_vdip , 0.U(16.W))
   val shClStatusVDipQ2 = RegNext(shClStatusVDipQ, 0.U(16.W))
-
   val vLedQ = RegNext(helloWorldReg(15, 0), 0.U(16.W))
   val preClShStatusVLed = vLedQ & shClStatusVDipQ2
   val clShStatusVLed = RegNext(preClShStatusVLed, 0.U(16.W))
   cl_sh_status_vled := clShStatusVLed
+
+  // HelloWorldレジスタ
+  arready := readStateReg === sReadAddrReady
+  rvalid := readStateReg === sReadDateValid
+  rdata := Mux(readAddrReg === HELLO_WORLD_REG_ADDR,
+    Cat(helloWorldReg(15, 0), helloWorldReg(31, 16)),
+    Cat(0.U(16.W), vLedQ))
+  rresp := AXI_OK    // エラーは起きないものとする
+
+  awready := writeStateReg === sWriteReady
+  wready := writeStateReg === sWriteReady
+  bresp := AXI_OK   // エラーは起きないものとする
+  bvalid := writeStateReg === sWriteDone
 }
 
 object ClHelloWorldCore extends App {
