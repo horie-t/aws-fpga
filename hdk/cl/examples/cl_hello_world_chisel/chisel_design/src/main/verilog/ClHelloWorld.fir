@@ -171,8 +171,8 @@ circuit ClHelloWorld :
     output ocl_sh_rdata : UInt<32>
     output ocl_sh_rresp : UInt<2>
     input sh_ocl_rready : UInt<1>
-    input sh_cl_status_vdip : UInt<1>
-    output cl_sh_status_vled : UInt<1>
+    input sh_cl_status_vdip : UInt<16>
+    output cl_sh_status_vled : UInt<16>
     
     inst resetSyncNegModule of ResetSyncNeg @[ClHelloWorld.scala 34:34]
     resetSyncNegModule.reset_sync_n is invalid

@@ -25,8 +25,8 @@ class ClHelloWorld extends RawModule {
   val ocl_sh_rresp = IO(Output(UInt(2.W)))
   val sh_ocl_rready = IO(Input(Bool()))
 
-  val sh_cl_status_vdip = IO(Input(Bool()))
-  val cl_sh_status_vled = IO(Output(Bool()))
+  val sh_cl_status_vdip = IO(Input(UInt(16.W)))
+  val cl_sh_status_vled = IO(Output(UInt(16.W)))
 
   /*----------------------------------------
    * リセット信号の同期化

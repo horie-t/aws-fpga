@@ -190,8 +190,8 @@ module ClHelloWorld(
   output [31:0] ocl_sh_rdata,
   output [1:0]  ocl_sh_rresp,
   input         sh_ocl_rready,
-  input         sh_cl_status_vdip,
-  output        cl_sh_status_vled
+  input  [15:0] sh_cl_status_vdip,
+  output [15:0] cl_sh_status_vled
 );
   wire  resetSyncNegModule_clock; // @[ClHelloWorld.scala 34:34]
   wire  resetSyncNegModule_reset_n; // @[ClHelloWorld.scala 34:34]
@@ -329,7 +329,7 @@ module ClHelloWorld(
   assign ocl_sh_rvalid = axiRegisterSliceModule_s_axi_rvalid; // @[ClHelloWorld.scala 61:17]
   assign ocl_sh_rdata = axiRegisterSliceModule_s_axi_rdata; // @[ClHelloWorld.scala 59:16]
   assign ocl_sh_rresp = axiRegisterSliceModule_s_axi_rresp; // @[ClHelloWorld.scala 60:16]
-  assign cl_sh_status_vled = ClHelloWorldCore_cl_sh_status_vled[0]; // @[ClHelloWorld.scala 85:23]
+  assign cl_sh_status_vled = ClHelloWorldCore_cl_sh_status_vled; // @[ClHelloWorld.scala 85:23]
   assign resetSyncNegModule_clock = clk_main_a0; // @[ClHelloWorld.scala 36:45]
   assign resetSyncNegModule_reset_n = rst_main_n; // @[ClHelloWorld.scala 37:26]
   assign axiRegisterSliceModule_aclk = clk_main_a0; // @[ClHelloWorld.scala 43:52]
@@ -363,5 +363,5 @@ module ClHelloWorld(
   assign ClHelloWorldCore_s_axi_arvalid = axiRegisterSliceModule_m_axi_arvalid; // @[ClHelloWorld.scala 72:42]
   assign ClHelloWorldCore_s_axi_araddr = axiRegisterSliceModule_m_axi_araddr; // @[ClHelloWorld.scala 73:41]
   assign ClHelloWorldCore_s_axi_rready = axiRegisterSliceModule_m_axi_rready; // @[ClHelloWorld.scala 74:41]
-  assign ClHelloWorldCore_sh_cl_status_vdip = {{15'd0}, sh_cl_status_vdip}; // @[ClHelloWorld.scala 84:46]
+  assign ClHelloWorldCore_sh_cl_status_vdip = sh_cl_status_vdip; // @[ClHelloWorld.scala 84:46]
 endmodule
