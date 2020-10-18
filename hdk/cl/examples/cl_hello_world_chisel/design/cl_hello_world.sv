@@ -46,11 +46,6 @@ logic rst_main_n_sync;
 `include "unused_apppf_irq_template.inc"
 
 //-------------------------------------------------
-// Wires
-//-------------------------------------------------
-  logic [15:0] pre_cl_sh_status_vled;
-   
-//-------------------------------------------------
 // ID Values (cl_hello_world_defines.vh)
 //-------------------------------------------------
   assign cl_sh_id0[31:0] = `CL_SH_ID0;
