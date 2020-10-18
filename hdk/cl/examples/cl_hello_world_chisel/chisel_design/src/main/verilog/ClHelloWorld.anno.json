@@ -10,6 +10,11 @@
     "emitter":"firrtl.VerilogEmitter"
   },
   {
+    "class":"firrtl.transforms.BlackBoxResourceAnno",
+    "target":"ClHelloWorld.ResetSyncNeg",
+    "resourceId":"/ResetSyncNeg.sv"
+  },
+  {
     "class":"firrtl.transforms.BlackBoxTargetDirAnno",
     "targetDir":"src/main/verilog"
   }
