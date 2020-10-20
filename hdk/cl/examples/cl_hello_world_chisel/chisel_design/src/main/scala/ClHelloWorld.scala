@@ -247,6 +247,37 @@ class axi_register_slice_light extends ExtModule(Map()) {
   val m_axi_rready = IO(Output(Bool()))
 }
 
+class AnalogSample extends MultiIOModule with Untie {
+  val analogPort = IO(Analog(2.W))
+
+  untie2()
+}
+
+trait Untie {
+  this: AnalogSample =>
+  class AnalogUntie extends BlackBox with HasBlackBoxInline {
+    val io = IO(new Bundle() {
+      val a = Analog(2.W)
+    })
+    setInline("AnalogUntie.sv",
+      """
+        |module AnalogUntie(inout [1:0] a);
+        |assign a = '0;
+        |endmodule
+        |""".stripMargin)
+
+  }
+
+  def untie2(): Unit = {
+    val analogUntie = Module(new AnalogUntie)
+    analogUntie.io.a <> analogPort
+  }
+}
+
 object ClHelloWorld extends App {
   chisel3.Driver.execute(args, () => new ClHelloWorld)
+}
+
+object AnalogSample extends App {
+  chisel3.Driver.execute(args, () => new AnalogSample)
 }
