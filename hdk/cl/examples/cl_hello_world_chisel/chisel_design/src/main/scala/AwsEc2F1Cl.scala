@@ -1,6 +1,9 @@
 import chisel3._
 import chisel3.experimental.Analog
 
+/**
+ * AWS EC2 F1インスタンスの独自回路(Custom Logic)のトップ・モジュール
+ */
 class AwsEc2F1Cl extends RawModule {
   val clk_main_a0 = IO(Input(Bool()))
   val clk_extra_a1 = IO(Input(Bool()))
@@ -253,4 +256,157 @@ class AwsEc2F1Cl extends RawModule {
   val bscanid_en = IO(Input(Bool()))
   val sh_cl_glcount0 = IO(Input(UInt(64.W)))
   val sh_cl_glcount1 = IO(Input(UInt(64.W)))
+}
+
+/**
+ * 割込みの接続を無しにする。
+ */
+trait TieOffAppPfIrq {
+  this: AwsEc2F1Cl =>
+
+  def tieOffAppPfIrq(): Unit = {
+    cl_sh_apppf_irq_req := 0.U(16.W)
+  }
+}
+
+/**
+ * SHからCL間のPCIeスレーブ(sda)の接続を無しにする。
+ */
+trait TieOffClSda {
+  this: AwsEc2F1Cl =>
+
+  def tieOffClSda(): Unit = {
+    cl_sda_awready := 0.U(1.W)
+    cl_sda_wready := 0.U(1.W)
+    cl_sda_bvalid := 0.U(1.W)
+    cl_sda_bresp := 0.U(2.W)
+    cl_sda_arready := 0.U(1.W)
+    cl_sda_rvalid := 0.U(1.W)
+    cl_sda_rdata := 0.U(32.W)
+    cl_sda_rresp := 0.U(2.W)
+  }
+}
+
+/**
+ * DDR4-Cへの接続を無しにする。
+ */
+trait TieOffDdrC {
+  this: AwsEc2F1Cl =>
+
+  def tieOffDdrC(): Unit = {
+    cl_sh_ddr_awid := 0.U(16.W)
+    cl_sh_ddr_awaddr := 0.U(64.W)
+    cl_sh_ddr_awlen := 0.U(8.W)
+    cl_sh_ddr_awsize := 0.U(3.W)
+    cl_sh_ddr_awvalid := 0.U(1.W)
+    cl_sh_ddr_awburst := 0.U(2.W)
+    cl_sh_ddr_wid := 0.U(16.W)
+    cl_sh_ddr_wdata := 0.U(512.W)
+    cl_sh_ddr_wstrb := 0.U(64.W)
+    cl_sh_ddr_wlast := 0.U(1.W)
+    cl_sh_ddr_wvalid := 0.U(1.W)
+    cl_sh_ddr_bready := 0.U(1.W)
+    cl_sh_ddr_arid := 0.U(16.W)
+    cl_sh_ddr_araddr := 0.U(64.W)
+    cl_sh_ddr_arlen := 0.U(8.W)
+    cl_sh_ddr_arsize := 0.U(3.W)
+    cl_sh_ddr_arvalid := 0.U(1.W)
+    cl_sh_ddr_arburst := 0.U(2.W)
+    cl_sh_ddr_rready := 0.U(1.W)
+  }
+}
+
+/**
+ * SHからCL間のDMA PCIeスレーブ(DMA_PCIS)の接続を無しにする。
+ */
+trait TieOffDmaPciS {
+  this: AwsEc2F1Cl =>
+
+  def tieOffDmaPciS(): Unit = {
+    cl_sh_dma_pcis_awready := 0.U(1.W)
+    cl_sh_dma_pcis_wready := 0.U(1.W)
+    cl_sh_dma_pcis_bid := 0.U(6.W)
+    cl_sh_dma_pcis_bresp := 0.U(2.W)
+    cl_sh_dma_pcis_bvalid := 0.U(1.W)
+    cl_sh_dma_pcis_arready := 0.U(1.W)
+    cl_sh_dma_pcis_rid := 0.U(6.W)
+    cl_sh_dma_pcis_rdata := 0.U(512.W)
+    cl_sh_dma_pcis_rresp := 0.U(2.W)
+    cl_sh_dma_pcis_rlast := 0.U(1.W)
+    cl_sh_dma_pcis_rvalid := 0.U(1.W)
+    cl_sh_dma_wr_full := 0.U(1.W)
+    cl_sh_dma_rd_full := 0.U(1.W)
+  }
+}
+
+trait TieOffFlr {
+  this: AwsEc2F1Cl =>
+
+  def tieOffFlr(): Unit = {
+    cl_sh_flr_done := 0.U(1.W)
+  }
+}
+
+/**
+ * CLからSHへのPCIeマスター(PCIM)接続を無しにする。
+ */
+trait TieOffPciM {
+  this: AwsEc2F1Cl =>
+
+  def tieOffPciM(): Unit = {
+    cl_sh_pcim_awid := 0.U(16.W)
+    cl_sh_pcim_awaddr := 0.U(64.W)
+    cl_sh_pcim_awlen := 0.U(8.W)
+    cl_sh_pcim_awsize := 0.U(3.W)
+    cl_sh_pcim_awuser := 0.U(19.W)
+    cl_sh_pcim_awvalid := 0.U(1.W)
+    cl_sh_pcim_wdata := 0.U(512.W)
+    cl_sh_pcim_wstrb := 0.U(64.W)
+    cl_sh_pcim_wlast := 0.U(1.W)
+    cl_sh_pcim_wvalid := 0.U(1.W)
+    cl_sh_pcim_bready := 0.U(1.W)
+    cl_sh_pcim_arid := 0.U(16.W)
+    cl_sh_pcim_araddr := 0.U(64.W)
+    cl_sh_pcim_arlen := 0.U(8.W)
+    cl_sh_pcim_arsize := 0.U(3.W)
+    cl_sh_pcim_aruser := 0.U(19.W)
+    cl_sh_pcim_arvalid := 0.U(1.W)
+    cl_sh_pcim_rready := 0.U(1.W)
+  }
+}
+
+/**
+ * SHからCLへのBAR1の接続を無しにする。
+ */
+trait TieOffShBar1 {
+  this: AwsEc2F1Cl =>
+
+  def tieOffShBar1(): Unit = {
+    bar1_sh_awready := 0.U(1.W)
+    bar1_sh_wready := 0.U(1.W)
+    bar1_sh_bvalid := 0.U(1.W)
+    bar1_sh_bresp := 0.U(2.W)
+    bar1_sh_arready := 0.U(1.W)
+    bar1_sh_rvalid := 0.U(1.W)
+    bar1_sh_rdata := 0.U(32.W)
+    bar1_sh_rresp := 0.U(2.W)
+  }
+}
+
+/**
+ * SHからCLへのOCLの接続を無しにする。
+ */
+trait TieOffOclSh {
+  this: AwsEc2F1Cl =>
+
+  def tieOffOclSh(): Unit = {
+    ocl_sh_awready := 0.U(1.W)
+    ocl_sh_wready := 0.U(1.W)
+    ocl_sh_bvalid := 0.U(1.W)
+    ocl_sh_bresp := 0.U(2.W)
+    ocl_sh_arready := 0.U(1.W)
+    ocl_sh_rvalid := 0.U(1.W)
+    ocl_sh_rdata := 0.U(32.W)
+    ocl_sh_rresp := 0.U(2.W)
+  }
 }
