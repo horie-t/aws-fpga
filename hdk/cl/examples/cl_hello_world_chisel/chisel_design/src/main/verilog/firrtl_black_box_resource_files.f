@@ -1,1 +1,2 @@
 /home/tetsuya/fpga/aws-fpga/hdk/cl/examples/cl_hello_world_chisel/chisel_design/src/main/verilog/ResetSyncNeg.sv
+/home/tetsuya/fpga/aws-fpga/hdk/cl/examples/cl_hello_world_chisel/chisel_design/src/main/verilog/TieOffDdrABDBlackBox.sv
