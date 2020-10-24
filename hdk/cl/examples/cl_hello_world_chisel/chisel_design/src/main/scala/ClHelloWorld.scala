@@ -3,7 +3,7 @@ import chisel3.withClockAndReset
 import chisel3.util._
 import chisel3.experimental._
 
-class ClHelloWorld extends AwsEc2F1Cl
+class cl_hello_world extends AwsEc2F1Cl
   with TieOffFlr
   with TieOffDdrABD
   with TieOffDdrC
@@ -81,6 +81,8 @@ class ClHelloWorld extends AwsEc2F1Cl
   // グローバル信号の接続を無しにする。
   cl_sh_status0 := 0.U(32.W)
   cl_sh_status1 := 0.U(32.W)
+
+  tdo := false.B
 }
 
 class ClHelloWorldCore extends MultiIOModule {
@@ -262,8 +264,8 @@ trait Untie {
   }
 }
 
-object ClHelloWorld extends App {
-  chisel3.Driver.execute(args, () => new ClHelloWorld)
+object cl_hello_world extends App {
+  chisel3.Driver.execute(args, () => new cl_hello_world)
 }
 
 object AnalogSample extends App {
