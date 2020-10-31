@@ -1,0 +1,113 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters: 
+  KeyPairParameter: # EC2インスタンスにSSHでログインする時のキーペアの名前
+    Type: String
+Resources:
+  F1DevVPC: # VPCを作成して、F1インスタンス作業専用のCloud環境を作成する。
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      Tags:
+      - Key: Name
+        Value: F1DevVPC
+  InternetGateway: # VPCとインターネットが通信できるようにGatwayを作成する
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: Name
+        Value: F1DevVPC-IGW
+  AttachGateway: # VPCとIntenetGatwayを接続する
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref F1DevVPC
+      InternetGatewayId: !Ref InternetGateway
+  PublicSubnet: # インターネットから接続できるpublicなサブネットを作成
+    Type: AWS::EC2::Subnet
+    DependsOn: AttachGateway
+    Properties:
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: 'true'
+      VpcId: !Ref F1DevVPC
+      Tags:
+      - Key: Name
+        Value: F1DevVPC-PublicSubnet
+  PublicRouteTable: # インターネットへの通信用のルートテーブル(テーブルの中身は次で定義)
+    Type: AWS::EC2::RouteTable
+    DependsOn: AttachGateway
+    Properties:
+      VpcId: !Ref F1DevVPC
+      Tags:
+      - Key: Name
+        Value: F1DevVPC-PublicRoute
+  PublicRoute: # PublicSubnetからインターネットへ通信するためのルーティング定義
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  PublicSubnetRouteTableAssociation: # ルートテーブルにルーティング定義を関連付け
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+  PublicSecurityGroup: # インターネットからSSHでEC2インスタンスにアクセスする(CiderIpはもっと狭めた方がよい)
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupName: "F1DevSecurityGroup"
+      GroupDescription: "ssh security group"
+      VpcId: !Ref F1DevVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: "0.0.0.0/0"
+      Tags:
+        - Key: Name
+          Value: "F1DevSecurityGroup"
+  DevEC2Instance: # DCP作成等の開発用インスタンス
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: "ami-0209388abb64ef69c" # FPGA Developer AMI - 1.8.1
+      InstanceType: "z1d.2xlarge"
+      KeyName: !Ref KeyPairParameter
+      NetworkInterfaces: 
+        - AssociatePublicIpAddress: "true"
+          DeviceIndex: "0"
+          SubnetId: !Ref PublicSubnet
+          GroupSet:
+            - !Ref PublicSecurityGroup
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 100
+            VolumeType: gp2
+      UserData: !Base64 |
+        #!/bin/bash
+        su centos -c "git clone https://github.com/aws/aws-fpga.git /home/centos/src/project_data/aws-fpga"
+      Tags:
+        - Key: Name
+          Value: "F1Dev Dev Instance"
+  F1EC2Instance: # AFIの実行用インスタンス
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: "ami-0209388abb64ef69c"
+      InstanceType: "f1.2xlarge"
+      KeyName: !Ref KeyPairParameter
+      NetworkInterfaces: 
+        - AssociatePublicIpAddress: "true"
+          DeviceIndex: "0"
+          SubnetId: !Ref PublicSubnet
+          GroupSet:
+            - !Ref PublicSecurityGroup
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 100
+            VolumeType: gp2
+      UserData: !Base64 |
+        #!/bin/bash
+        su centos -c "git clone https://github.com/aws/aws-fpga.git /home/centos/src/project_data/aws-fpga"
+      Tags:
+        - Key: Name
+          Value: "F1Dev F1 Instance"
