@@ -2,6 +2,9 @@ AWSTemplateFormatVersion: '2010-09-09'
 Parameters: 
   KeyPairParameter: # EC2インスタンスにSSHでログインする時のキーペアの名前
     Type: String
+  GitRepoURL:
+    Type: String
+    Default: https://github.com/aws/aws-fpga.git
 Resources:
   F1DevVPC: # VPCを作成して、F1インスタンス作業専用のCloud環境を作成する。
     Type: AWS::EC2::VPC
@@ -26,6 +29,7 @@ Resources:
     DependsOn: AttachGateway
     Properties:
       CidrBlock: 10.0.1.0/24
+      AvailabilityZone: us-west-2c
       MapPublicIpOnLaunch: 'true'
       VpcId: !Ref F1DevVPC
       Tags:
@@ -82,9 +86,12 @@ Resources:
           Ebs:
             VolumeSize: 100
             VolumeType: gp2
-      UserData: !Base64 |
-        #!/bin/bash
-        su centos -c "git clone https://github.com/aws/aws-fpga.git /home/centos/src/project_data/aws-fpga"
+        - DeviceName: /dev/sdb
+          NoDevice: {}
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          su centos -c "git clone ${GitRepoURL} /home/centos/src/project_data/aws-fpga"
       Tags:
         - Key: Name
           Value: "F1Dev Dev Instance"
@@ -105,9 +112,12 @@ Resources:
           Ebs:
             VolumeSize: 100
             VolumeType: gp2
-      UserData: !Base64 |
-        #!/bin/bash
-        su centos -c "git clone https://github.com/aws/aws-fpga.git /home/centos/src/project_data/aws-fpga"
+        - DeviceName: /dev/sdb
+          NoDevice: {}
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          su centos -c "git clone ${GitRepoURL} /home/centos/src/project_data/aws-fpga"
       Tags:
         - Key: Name
           Value: "F1Dev F1 Instance"
