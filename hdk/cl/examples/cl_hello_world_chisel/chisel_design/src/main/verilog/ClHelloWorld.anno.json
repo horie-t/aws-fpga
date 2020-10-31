@@ -6,16 +6,13 @@
     }
   },
   {
-    "class":"firrtl.options.TargetDirAnnotation",
-    "directory":"src/main/verilog"
-  },
-  {
     "class":"firrtl.EmitCircuitAnnotation",
     "emitter":"firrtl.VerilogEmitter"
   },
   {
-    "class":"firrtl.options.OutputAnnotationFileAnnotation",
-    "file":"ClHelloWorldCore"
+    "class":"firrtl.transforms.BlackBoxResourceAnno",
+    "target":"ClHelloWorld.ResetSyncNeg",
+    "resourceId":"/ResetSyncNeg.sv"
   },
   {
     "class":"firrtl.transforms.BlackBoxTargetDirAnno",
